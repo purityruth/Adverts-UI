@@ -1,10 +1,8 @@
-
-
 function AdvertiserHome() {
-
     return (
-        <div>
-            Advertiser Home 
+        <div >
+            <p className="text-7xl">Adve</p>
+            <p className="text-2xl">Adve</p>
         </div>
     );
 }
