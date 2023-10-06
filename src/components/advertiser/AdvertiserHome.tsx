@@ -1,5 +1,4 @@
 import { BsGraphUpArrow, BsGraphDownArrow } from 'react-icons/bs';
-import DepositIcon from '/deposit.svg';
 
 const ActionButton = ({ text, children }: { text: string, children: React.ReactNode }) => (
     <button className="bg-bg-primary flex items-center hover:bg-gray-200 text-white px-4 py-1">
@@ -73,7 +72,6 @@ function AdvertiserHome() {
                     <div className='border-b my-9 border-slate-400'>
                         <div className='mt-4'>
                             <ActionButton text='Deposit'>
-                                <img src={DepositIcon} alt="" className="w-8 h-8 mr-2" />
                             </ActionButton>
                             <h2 className='text-xl font-bold mx-3 text-black'>Transaction History</h2>
                             <p className='mx-3 mb-3 text-sm text-slate-400'>History of last 3 month</p>
