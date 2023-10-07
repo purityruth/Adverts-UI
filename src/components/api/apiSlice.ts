@@ -28,7 +28,14 @@ export const apiSlice = createApi({
       query: (formData) => ({
         url: 'adverts/create/',
         method: 'post',
-        body: formData, // Assuming formData is an object with the necessary data
+        body: formData,
+      }),
+    }),
+
+    getAllAdverts: builder.query({
+      query: () => ({
+        url: 'adverts/all/',
+        method: 'get'
       }),
     }),
   }),
@@ -56,4 +63,7 @@ export type AppThunk<ReturnType = void> = ThunkAction<
 >;
 
 // Export the createAdvert endpoint and associated hooks
-export const { useCreateAdvertMutation } = apiSlice;
+export const { 
+  useCreateAdvertMutation,
+  useGetAllAdvertsQuery
+ } = apiSlice;
