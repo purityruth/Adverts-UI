@@ -5,10 +5,10 @@ import { SubmitHandler } from 'react-hook-form';
 interface UploadAdvertModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpload: (formData: CustomFormData) => void;
+  onUpload: (formData: CustomFormData) => void; 
 }
 
-interface CustomFormData {
+export interface CustomFormData {
   title: string;
   description: string;
   advertType: string;

@@ -38,6 +38,29 @@ export const apiSlice = createApi({
         method: 'get'
       }),
     }),
+
+    sceduleAdvert: builder.mutation({
+      query: (formData) => ({
+        url: 'adverts/schedules/create/',
+        method: 'post',
+        body: formData,
+      })
+    }),
+
+    getSceduleAdvert: builder.query({
+      query: () => ({
+        url: 'adverts/schedules/create/',
+        method: 'get',
+      })
+    }),
+
+    getScheduledAdverts: builder.query({
+      query: () => ({
+        url: 'adverts/schedules/',
+        method: 'get',
+      })
+    })
+    
   }),
 });
 
@@ -65,5 +88,8 @@ export type AppThunk<ReturnType = void> = ThunkAction<
 // Export the createAdvert endpoint and associated hooks
 export const { 
   useCreateAdvertMutation,
-  useGetAllAdvertsQuery
+  useGetAllAdvertsQuery,
+  useSceduleAdvertMutation,
+  useGetSceduleAdvertQuery,
+  useGetScheduledAdvertsQuery
  } = apiSlice;
