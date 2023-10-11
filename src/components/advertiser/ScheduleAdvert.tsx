@@ -143,7 +143,7 @@ const ScheduleAdvert: React.FC<ScheduleAdvertProps> = ({ isOpen, onClose }) => {
               value={slot}
               onChange={(e) => setRoute(e.target.value)}
             >
-              <option value="">Select Route</option>
+              <option value="">Select Slot</option>
               {advertsData?.slots.map((slot: any) => (
                 <option key={slot.id} value={slot.id}>
                   {slot.name}
