@@ -1,18 +1,11 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useState, useEffect } from "react";
 import { FaAngleDown } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
 
-interface SubRoute {
-    icon: React.ReactNode;
-    name: string;
-    path: string;
-  }
   
   interface MenuRoute {
     icon: React.ReactNode;
     name: string;
-    subRoutes: SubRoute[];
   }
 
 interface SidebarMenuProps {
@@ -117,14 +110,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({
             exit="hidden"
             className="menu_container"
           >
-            {route.subRoutes.map((subRoute, i) => (
-              <motion.div variants={menuAnimation} key={i} custom={i}>
-                <NavLink to={subRoute.path} className="link">
-                  <div className="icon">{subRoute.icon}</div>
-                  <motion.div className="link_text">{subRoute.name}</motion.div>
-                </NavLink>
-              </motion.div>
-            ))}
+           
           </motion.div>
         )}
       </AnimatePresence>

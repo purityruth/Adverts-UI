@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useCreateAdvertMutation } from '../api/apiSlice';
 import { SubmitHandler } from 'react-hook-form';
+import { useCreateAdvertMutation } from '../api/apiSlice';
 
 interface UploadAdvertModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpload: (formData: CustomFormData) => void; 
+  onUpload: (formData: CustomFormData) => void;
 }
 
 export interface CustomFormData {
@@ -25,11 +25,11 @@ const UploadAdvertModal: React.FC<UploadAdvertModalProps> = ({ isOpen, onClose }
   const [advertType, setAdvertType] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
   const [type, setType] = useState<string>('popup');
-  const [duration, setDuration] = useState<number>(2);
-  const [link, setLink] = useState<string>('');
+  const [duration] = useState<number>(2);
+  const [link] = useState<string>('');
   const [progress, setProgress] = useState<number>(0);
   const [createAdvert] = useCreateAdvertMutation();
-
+  const img = `https://i.ytimg.com/vi/OXaosfKO21k/maxresdefault.jpg`
 
   const onSubmit: SubmitHandler<CustomFormData> = async (data) => {
     if (!data.file) {
@@ -42,7 +42,7 @@ const UploadAdvertModal: React.FC<UploadAdvertModalProps> = ({ isOpen, onClose }
     const allowedImageTypes = ['.jpg', '.jpeg', '.png', '.gif'];
     const allowedVideoTypes = ['.mp4', '.avi', '.mov'];
 
-    const fileType = data.type === 'popup' ? allowedImageTypes : allowedVideoTypes;
+    const fileType = data.type === 'Popup' ? allowedImageTypes : allowedVideoTypes;
     const fileExtension = data.file.name.split('.').pop();
 
     if (!fileType.includes(`.${fileExtension}`)) {
@@ -75,21 +75,21 @@ const UploadAdvertModal: React.FC<UploadAdvertModalProps> = ({ isOpen, onClose }
 
     try {
       // Upload the file using the API
-      const res = await fetch('https://media.tunycemedia.com/upload/advert', {
-        method: 'POST',
-        body: formData,
-      });
+      // const res = await fetch('https://mediav1.tunycemedia.com/upload/advert', {
+      //   method: 'POST',
+      //   body: formData,
+      // });
 
-      if (!res.ok) {
-        throw new Error('Failed to upload the file');
-      }
-      const responseData = await res.json();
-      const link = responseData.file;
+      // if (!res.ok) {
+      //   throw new Error('Failed to upload the file');
+      // }
+      // const responseData = await res.json();
+      // const link = responseData.advertPath;
       const createAdvertData = {
         ...data,
-        link: link,
+        link: img,
       };
-      console.log(link)
+      // console.log(responseData)
       const createResponse = await createAdvert(createAdvertData);
       console.log('Create Advert Response:', createResponse);
 
@@ -160,14 +160,17 @@ const UploadAdvertModal: React.FC<UploadAdvertModalProps> = ({ isOpen, onClose }
             ></textarea>
           </div>
           <div className="mb-4">
-            <input
-              type="text"
+            <select
               id="advertType"
               className="w-full px-3 py-2 border-none bg-gray-100 rounded-2xl focus:bg-white focus:border-orange-500"
-              placeholder="Enter advertType"
               value={advertType}
               onChange={(e) => setAdvertType(e.target.value)}
-            />
+            >
+              <option value="">Select Advert Type</option>
+              <option value="Popup">Popup</option>
+              <option value="Squeezeback">Squeezeback</option>
+              <option value="Scrolls">Scrolls</option>
+            </select>
           </div>
           <div className="mb-4">
             <select
@@ -176,7 +179,8 @@ const UploadAdvertModal: React.FC<UploadAdvertModalProps> = ({ isOpen, onClose }
               value={type}
               onChange={(e) => setType(e.target.value)}
             >
-              <option value="popup">Image</option>
+              <option value="">Select File Type</option>
+              <option value="Popup">Image</option>
               <option value="video">Video</option>
             </select>
           </div>
@@ -198,7 +202,7 @@ const UploadAdvertModal: React.FC<UploadAdvertModalProps> = ({ isOpen, onClose }
                 <input
                   type="file"
                   id="FileInput"
-                  accept={type === 'popup' ? '.jpg, .jpeg, .png, .gif' : '.mp4, .avi, .mov'}
+                  accept={type === 'Popup' ? '.jpg, .jpeg, .png, .gif' : '.mp4, .avi, .mov'}
                   style={{ display: 'none' }}
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                 />
@@ -217,7 +221,6 @@ const UploadAdvertModal: React.FC<UploadAdvertModalProps> = ({ isOpen, onClose }
                 className="absolute h-full bg-orange-500 rounded-3xl"
                 style={{ width: `${progress}%` }}
               ><p className="text-center font-bold z-50 text-sm text-gray-700">{progress}%</p></div>
-              
             </div>
           )}
         </div>

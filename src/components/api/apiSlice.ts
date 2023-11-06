@@ -4,7 +4,7 @@ import { persistStore } from 'redux-persist';
 
 // Define your base query with the API base URL
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'https://warm-journey-18609535df73.herokuapp.com/api/v1/',
+  baseUrl: 'https://michaelowenkimathi.site/api/v1/',
   prepareHeaders: (headers) => {
     // Get the token from the URL
     const queryString = window.location.search;
@@ -59,7 +59,22 @@ export const apiSlice = createApi({
         url: 'adverts/schedules/',
         method: 'get',
       })
-    })
+    }),
+
+    getAdvertsReports: builder.query({
+      query: (id) => ({
+        url: `adverts/pricing-plans/${id}`,
+        method: 'get',
+      })
+    }),
+
+    payScheduledAdverts: builder.mutation({
+      query: (id) => ({
+        url: `adverts/payments/${id}`,
+        method: 'post',
+      }),
+    }),
+
     
   }),
 });
@@ -91,5 +106,7 @@ export const {
   useGetAllAdvertsQuery,
   useSceduleAdvertMutation,
   useGetSceduleAdvertQuery,
-  useGetScheduledAdvertsQuery
+  useGetScheduledAdvertsQuery,
+  usePayScheduledAdvertsMutation,
+  useGetAdvertsReportsQuery
  } = apiSlice;

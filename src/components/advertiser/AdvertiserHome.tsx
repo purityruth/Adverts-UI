@@ -1,12 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useGetAdvertsReportsQuery, useGetAllAdvertsQuery, useGetScheduledAdvertsQuery } from "../api/apiSlice";
+import ScheduleAdvert, { ScheduleFormData } from "./ScheduleAdvert";
+import PayPopup from "./PayPopup";
+import { Advert, ScheduleAdverts } from "../type";
 import UploadAdvertModal, { CustomFormData } from "./UploadAdvertModal";
-import { useGetAllAdvertsQuery, useGetScheduledAdvertsQuery } from "../api/apiSlice";
-import ScheduleAdvert from "./ScheduleAdvert";
-
 
 
 const ActionButton = ({ text, onClick }: { text: string; onClick: () => void; children: React.ReactNode }) => (
     <button className=" flex items-center bg-orange-600 hover:bg-orange-400 px-4 py-1 h-10 rounded-2xl" onClick={onClick}>
+        <span className='text-white  font-bold'>{text}</span>
+    </button>
+);
+
+const ActionButtonPay = ({ text, onClick }: { text: string; onClick: () => void; children: React.ReactNode }) => (
+    <button className=" flex items-center bg-green-600 hover:bg-green-400 px-4 py-1 h-10 rounded-2xl" onClick={onClick}>
         <span className='text-white  font-bold'>{text}</span>
     </button>
 );
@@ -17,16 +24,13 @@ const ScheduleButton = ({ text, onClick }: { text: string; onClick: () => void; 
     </button>
 );
 
-const StatItem = ({ text, children, currentPrice, lastPrice }: { text: string; currentPrice: number; lastPrice: number; children: React.ReactNode }) => {
-    const priceDifference = currentPrice - lastPrice;
-    const isPriceRise = priceDifference > 0;
-    const isPriceDrop = priceDifference < 0;
+const StatItem = ({ text, children, report }: { text: string; report: number; children: React.ReactNode }) => {
 
     return (
         <div className='border py-3 m-2 px-2 rounded-lg w-48 h-28 border-b-gray-200'>
             <p className='text-lg text-slate-600 my-1'>{text}</p>
-            <h2 className={`text-xl font-bold ${isPriceRise ? 'text-green-400' : isPriceDrop ? 'text-red-500' : 'text-black'} my-1`}>
-                {currentPrice}
+            <h2 className={`text-xl font-bold text-green-400 my-1`}>
+                {report}
             </h2>
             <p className='text-sm text-slate-600 my-1'>
                 {children}
@@ -37,14 +41,43 @@ const StatItem = ({ text, children, currentPrice, lastPrice }: { text: string; c
 
 
 
-const date = new Date('12/12/2021');
 function AdvertiserHome() {
     const [isUploadModalOpen, setUploadModalOpen] = useState<boolean>(false);
     const [isScheduleModalOpen, setScheduleModalOpen] = useState<boolean>(false);
     const { data: allAdverts } = useGetAllAdvertsQuery([])
     const [activeTab, setActiveTab] = useState<string>('adverts');
     const { data: scheduledAdverts } = useGetScheduledAdvertsQuery([]);
-    console.log(allAdverts)
+    const [ads, setAds] = useState([]);
+    const [isPayPopupOpen, setPayPopupOpen] = useState(false);
+    const [balance, setBalance] = useState(1000);
+    const [amountToPay, setAmountToPay] = useState(250);
+    const { data: advertReports } = useGetAdvertsReportsQuery([])
+    console.log(advertReports)
+
+
+    const handleOpenPayPopup = () => {
+        setPayPopupOpen(true);
+    };
+
+    const handleClosePayPopup = () => {
+        setPayPopupOpen(false);
+    };
+
+    const handleConfirmPayment = () => {
+        // Handle the payment logic here
+        // You can make an API request to process the payment
+
+        // Close the pay popup after payment is processed
+        setPayPopupOpen(false);
+    };
+
+    useEffect(() => {
+        if (allAdverts) {
+            setAds(allAdverts);
+        }
+    }, [allAdverts]);
+    console.log(ads)
+
     const handleUploadAdvertClick = () => {
         setUploadModalOpen(true);
     };
@@ -68,6 +101,11 @@ function AdvertiserHome() {
         handleCloseModal();
     };
 
+    const handleUploadSchedule = (formData: ScheduleFormData) => {
+        console.log('Uploading content...', formData);
+        handleCloseModal();
+    };
+
 
     const renderTable = () => {
         if (activeTab === 'adverts') {
@@ -78,14 +116,14 @@ function AdvertiserHome() {
                         <tr className='text-left bg-gray-200'>
                             <th className='px-3 py-2'>Name</th>
                             <th className='px-3 py-2'>Date</th>
-                            <th className='px-3 py-2'>Transaction ID</th>
-                            <th className='px-3 py-2'>Quantity</th>
+                            <th className='px-3 py-2'>Status</th>
+                            <th className='px-3 py-2'>Duration</th>
                             <th className='px-3 py-2'>Type</th>
                             <th className='px-3 py-2'>Status</th>
                         </tr>
                     </thead>
                     {
-                        allAdverts && allAdverts.map((advert: any) => (
+                        ads && ads.map((advert: Advert) => (
                             <tbody>
                                 <tr className='text-left'>
                                     <td className='px-3 py-2'>
@@ -96,37 +134,18 @@ function AdvertiserHome() {
                                         {new Date(advert.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
                                     </td>
                                     <td className='px-3 py-2'>
-                                        {advert && advert.is_active ? 'active' : 'in active'}
+                                        {advert && advert.is_active ? 'active' : 'inactive'}
                                     </td>
                                     <td className='px-3 py-2'>{advert.duration}</td>
                                     <td className='px-3 py-2'>{advert.type}</td>
                                     <td className='px-3 py-2 text-green-600'>
-                                        {advert && advert.is_approved ? 'approved' : 'in progress'}
+                                        {advert && advert.is_approved ? 'approved' : 'inprogress'}
                                     </td>
                                 </tr>
                                 {/* Add more rows as needed */}
                             </tbody>
                         ))
                     }
-                    <tbody>
-                        <tr className='text-left'>
-                            <td className='px-3 py-2'>
-                                <img src="https://picsum.photos/200/300" alt="" className="w-10 h-10 rounded-full inline-block object-cover" />
-                                <span>Telescope Productis</span>
-                            </td>
-                            <td className='px-3 py-2'>{date.toDateString() + ',' + date.toLocaleTimeString()}</td>
-                            <td className='px-3 py-2'>HHGJGI587KF</td>
-                            <td className='px-3 py-2'>Ksh 2000</td>
-                            <td className='px-3 py-2'>withdraw</td>
-                            <td className='px-3 py-2 text-green-600'>Success</td>
-                            <td>
-                                <ScheduleButton text='schedule' onClick={handleScheduleClick}>
-                                    Schedule
-                                </ScheduleButton>
-                            </td>
-                        </tr>
-                        {/* Add more rows as needed */}
-                    </tbody>
                 </table>
             );
         } else if (activeTab === 'scheduledAds') {
@@ -141,15 +160,16 @@ function AdvertiserHome() {
                             <th className='px-3 py-2'>Schedule</th>
                             <th className='px-3 py-2'>Cost</th>
                             <th className='px-3 py-2'>Status</th>
+                            <th className='px-3 py-2'>Pay</th>
                         </tr>
                     </thead>
                     {
-                        scheduledAdverts && scheduledAdverts.map((scheduledAds: any) => (
+                        scheduledAdverts && scheduledAdverts.map((scheduledAds: ScheduleAdverts) => (
                             <tbody>
                                 <tr className='text-left'>
                                     <td className='px-3 py-2'>
                                         <img src="https://picsum.photos/200/300" alt="" className="w-10 h-10 rounded-full inline-block object-cover" />
-                                        <span>{scheduledAds.advert}</span>
+                                        <span>{scheduledAds.advert.title}</span>
                                     </td>
                                     <td className='px-3 py-2'>
                                         {new Date(scheduledAds.valid_to).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
@@ -166,6 +186,11 @@ function AdvertiserHome() {
                                     </td>
                                     <td className='px-3 py-2 text-green-600'>
                                         {scheduledAds && scheduledAds.is_paid ? 'approved' : 'in progress'}
+                                    </td>
+                                    <td className="px-3 py-2">
+                                        <ActionButtonPay text="pay" onClick={handleOpenPayPopup}>
+                                            Pay
+                                        </ActionButtonPay>
                                     </td>
                                 </tr>
                                 {/* Add more rows as needed */}
@@ -185,23 +210,27 @@ function AdvertiserHome() {
                 <div className='my-2'>
                     <div className='flex p-2 items-center justify-between'>
                         <h2 className='text-xl font-bold text-black'>Statistics</h2>
-                        <select id="countries" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-text-primary focus:border-text-primary  dark:bg-gray-700 dark:border-text-primary dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        {/* <select id="countries" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-text-primary focus:border-text-primary  dark:bg-gray-700 dark:border-text-primary dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                             <option selected>Last 30 days</option>
                             <option value="US">Last One week</option>
                             <option value="CA">Ngara road</option>
-                        </select>
+                        </select> */}
                     </div>
+                    {/* {
+                        advertReports && advertReports?.map((reports: any) => (
+                        ))
+                    } */}
                     <div className='flex items-center'>
-                        <StatItem text='Total Advert' currentPrice={250000} lastPrice={240000}>
+                        <StatItem text='Total Views' report={0} >
                             {/* ... */}
                         </StatItem>
-                        <StatItem text='Total Advert Report' currentPrice={19000} lastPrice={220000}>
+                        <StatItem text='Total Matatus' report={0} >
                             {/* ... */}
                         </StatItem>
-                        <StatItem text='Active Advert' currentPrice={16000} lastPrice={15000}>
+                        <StatItem text='Total Restaurants' report={0} >
                             {/* ... */}
                         </StatItem>
-                        <StatItem text='Inactive Advert' currentPrice={16000} lastPrice={15000}>
+                        <StatItem text='Active Adverts' report={0} >
                             {/* ... */}
                         </StatItem>
                     </div>
@@ -215,8 +244,8 @@ function AdvertiserHome() {
                     <div className='border-b my-9 border-slate-400 p-2'>
                         <div className='mt-4 flex justify-between items-center'>
                             <div className="mt-4">
-                                <h2 className='text-xl font-bold mx-3 text-black'>All Adverts</h2>
-                                <p className='mx-3 mb-3 text-sm text-slate-400'>History of last 3 month</p>
+                                <h2 className='text-xl font-bold mx-3 text-black'>All Scheduled Adverts</h2>
+                                {/* <p className='mx-3 mb-3 text-sm text-slate-400'>History of last 3 month</p> */}
                             </div>
                             <div className="mt-4 flex gap-3">
                                 <ScheduleButton text='schedule' onClick={handleScheduleClick}>
@@ -278,7 +307,14 @@ function AdvertiserHome() {
                     </div>
                 </div>
                 <UploadAdvertModal isOpen={isUploadModalOpen} onClose={handleCloseModal} onUpload={handleUpload} />
-                <ScheduleAdvert isOpen={isScheduleModalOpen} onClose={handleCloseModal} onUpload={handleUpload} />
+                <ScheduleAdvert isOpen={isScheduleModalOpen} onClose={handleCloseModal} onSchedule={handleUploadSchedule} />
+                <PayPopup
+                    isOpen={isPayPopupOpen}
+                    balance={balance}
+                    amountToPay={amountToPay}
+                    onClose={handleClosePayPopup}
+                    onConfirmPayment={handleConfirmPayment}
+                    id={0} />
             </div>
         </div>
     );

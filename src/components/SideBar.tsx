@@ -10,7 +10,6 @@ interface SidebarRoute {
     path: string;
     name: string;
     icon: React.ReactNode;
-    subRoutes?: SidebarRoute[];
 }
 
 interface SideBarProps {
@@ -74,6 +73,7 @@ const SideBar: React.FC<SideBarProps> = ({ children }) => {
         },
     ];
 
+    console.log('routes', routes)
     return (
         <>
             <div className="main-container">
@@ -114,11 +114,11 @@ const SideBar: React.FC<SideBarProps> = ({ children }) => {
                         {routes.map((route, index) => (
                             <SidebarMenu
                                 setIsOpen={setIsOpen}
-                                route={route}
                                 showAnimation={showAnimation}
                                 isOpen={isOpen}
-                                key={index}
-                            />
+                                key={index} 
+                                route={route}
+                                />
                         ))}
                     </section>
                 </motion.div>
