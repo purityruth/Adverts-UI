@@ -49,8 +49,8 @@ function AdvertiserHome() {
     const { data: scheduledAdverts } = useGetScheduledAdvertsQuery([]);
     const [ads, setAds] = useState([]);
     const [isPayPopupOpen, setPayPopupOpen] = useState(false);
-    const [balance, setBalance] = useState(1000);
-    const [amountToPay, setAmountToPay] = useState(250);
+    const [balance] = useState(1000);
+    const [amountToPay] = useState(250);
     const { data: advertReports } = useGetAdvertsReportsQuery([])
     console.log(advertReports)
 
